@@ -1,6 +1,6 @@
 # nol.dotenv
 
-Chargement de fichiers .env en pur [Nolc](https://github.com/Noliae-France/nolc), sans dépendance.
+Chargement de fichiers .env en pur [Nolc](https://noliae-nolc.s3.gra.io.cloud.ovh.net/nolc-latest-linux-x86_64.tar.gz), sans dépendance.
 
 ## Installation
 

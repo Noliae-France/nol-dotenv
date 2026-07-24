@@ -2,7 +2,7 @@
 nom = "nol-dotenv"
 version = "0.1.0"
 entree = "src/lib.nol"
-auteur = "Bastien LANGUEDOC"
+auteur = "daliranas <bastien@languedoc.ovh>"
 licence = "MIT"
 description = "Chargement de fichiers .env (cle=valeur, commentaires, guillemets) en pur Nolc."
 
