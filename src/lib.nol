@@ -1,0 +1,87 @@
+// nol.dotenv — chargement de fichiers « .env » en pur Nolc.
+//
+// Parse des lignes « CLE=valeur ». Ignore les lignes vides et les commentaires
+// (« # »). Retire les guillemets simples ou doubles entourant la valeur. Rend
+// une Map<Text> ; un chemin absent donne une map vide (jamais d'erreur fatale).
+
+// Retire une paire de guillemets (' ou ") entourant la valeur, si présente.
+fn dotenv_deguillemete(v: Text) -> Text {
+    let n = len(v)
+    if n >= 2 {
+        let d = sub(v, 0, 1)
+        let f = sub(v, n - 1, 1)
+        if (d == "\"" and f == "\"") or (d == "'" and f == "'") {
+            return sub(v, 1, n - 2)
+        }
+    }
+    return v
+}
+
+// Parse le contenu d'un .env en Map<Text> (clé -> valeur).
+fn dotenv_parse(contenu: Text) -> Map<Text> {
+    var m: Map<Text> = map_new()
+    for ligne in split(contenu, "\n") {
+        let l = trim(ligne)
+        // Ligne vide ou commentaire : ignorée.
+        if len(l) > 0 and not starts_with(l, "#") {
+            let eq = unwrap_or(find(l, "="), -1)
+            if eq > 0 {
+                let cle = trim(sub(l, 0, eq))
+                let brut = trim(sub(l, eq + 1, len(l) - eq - 1))
+                map_set(m, cle, dotenv_deguillemete(brut))
+            }
+        }
+    }
+    return m
+}
+
+// Map<Text> vide (contexte de type pour map_new).
+fn dotenv_vide() -> Map<Text> {
+    var m: Map<Text> = map_new()
+    return m
+}
+
+// Charge un fichier .env ; map vide si le fichier est absent.
+fn dotenv_charge(chemin: Text) -> Map<Text> {
+    match file_read(chemin) {
+        some(contenu) => return dotenv_parse(contenu),
+        none => return dotenv_vide(),
+    }
+    return dotenv_vide()
+}
+
+// Lit une clé (Option).
+fn dotenv_lire(env: Map<Text>, cle: Text) -> Option<Text> {
+    return map_get(env, cle)
+}
+
+// Lit une clé avec valeur par défaut.
+fn dotenv_ou(env: Map<Text>, cle: Text, defaut: Text) -> Text {
+    return unwrap_or(map_get(env, cle), defaut)
+}
+
+// ============================ TESTS ============================
+
+fn test_parse_simple() {
+    let m = dotenv_parse("A=1\nB=deux\n")
+    assert(dotenv_ou(m, "A", "") == "1", "cle A")
+    assert(dotenv_ou(m, "B", "") == "deux", "cle B")
+}
+
+fn test_commentaires_et_vides() {
+    let m = dotenv_parse("# commentaire\n\nHOST=localhost\n  # indente\nPORT=5432\n")
+    assert(dotenv_ou(m, "HOST", "") == "localhost", "host")
+    assert(dotenv_ou(m, "PORT", "") == "5432", "port")
+    assert(dotenv_ou(m, "absent", "defaut") == "defaut", "defaut si absent")
+}
+
+fn test_guillemets() {
+    let m = dotenv_parse("MDP=\"secret space\"\nJETON='abc'\n")
+    assert(dotenv_ou(m, "MDP", "") == "secret space", "double guillemets retires")
+    assert(dotenv_ou(m, "JETON", "") == "abc", "simples guillemets retires")
+}
+
+fn test_charge_absent() {
+    let m = dotenv_charge("/chemin/inexistant/.env")
+    assert(unwrap_or(dotenv_lire(m, "X"), "VIDE") == "VIDE", "map vide si fichier absent")
+}

@@ -1,0 +1,9 @@
+[projet]
+nom = "nol-dotenv"
+version = "0.1.0"
+entree = "src/lib.nol"
+auteur = "Bastien LANGUEDOC"
+licence = "MIT"
+description = "Chargement de fichiers .env (cle=valeur, commentaires, guillemets) en pur Nolc."
+
+[dependances]
