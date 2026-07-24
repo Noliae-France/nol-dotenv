@@ -4,6 +4,6 @@ version = "0.1.0"
 entree = "src/lib.nol"
 auteur = "daliranas <bastien@languedoc.ovh>"
 licence = "MIT"
-description = "Chargement de fichiers .env (cle=valeur, commentaires, guillemets) en pur Nolc."
+description = "Chargement de fichiers .env (clé=valeur, commentaires, guillemets) en pur Nolc."
 
 [dependances]
